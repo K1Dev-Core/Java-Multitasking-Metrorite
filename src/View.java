@@ -59,6 +59,11 @@ public class View extends JPanel {
             } else {
                 SpriteSheet.drawFrame(g, rock.getSpriteType(), rock.getCurrentFrame(),
                         (int) rock.posX, (int) rock.posY, rock.size);
+                        
+                if (Config.debug) {
+                    g.setColor(Color.WHITE);
+                    g.drawString("ID:" + rock.rockID, (int)rock.posX - 10, (int)rock.posY - rock.size - 5);
+                }
             }
         }
         
