@@ -21,7 +21,7 @@ public class Background {
             blendedBackground = new BufferedImage(w * 2, h * 2, BufferedImage.TYPE_INT_ARGB);
             Graphics2D g2d = blendedBackground.createGraphics();
             
-            // วาดภาพ 2x2 แบบซ้อนทับกัน
+
             for (int y = 0; y < 2; y++) {
                 for (int x = 0; x < 2; x++) {
                     g2d.drawImage(originalBg, x * w, y * h, null);

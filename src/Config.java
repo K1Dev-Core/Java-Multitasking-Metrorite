@@ -10,7 +10,7 @@ public class Config {
     public static double rockMaxSpeed = 8.0;
     public static int updateDelay = 12;
     public static int frameDelay = 16;
-    public static int meteorSpriteSheetMax = 6;
+    public static int meteorSpriteSheetMax = 7;
     public static boolean showFPS = true;
     public static boolean debug = true;
 }
