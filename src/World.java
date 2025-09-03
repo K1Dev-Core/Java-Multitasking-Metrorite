@@ -33,7 +33,7 @@ public class World {
     }
 
     public void update() {
-
+        Background.update();
         rocks.removeIf(Rock::isExplodeFinished);
         
 
