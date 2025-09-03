@@ -1,13 +1,16 @@
 public class Config {
-    public static int W = 900;
-    public static int H = 600;
-    public static int N = 12;
-    public static int R_MIN = 10;
-    public static int R_MAX = 18;
-    public static double V_MIN = 1.2;
-    public static double V_MAX = 3.2;
-    public static double SPEED_UP = 1.08;
-    public static double MAX_SPEED = 8.0;
-    public static int TICK_MS = 12;
-    public static int FPS_MS = 16;
+    public static int screenWidth = 800;
+    public static int screenHeight = 900;
+    public static int rockAmount = 12;
+    public static int rockSizeMin = 20;
+    public static int rockSizeMax = 30;
+    public static double rockSpeedMin = 1.2;
+    public static double rockSpeedMax = 3.2;
+    public static double rockSpeedUpRate = 1.08;
+    public static double rockMaxSpeed = 8.0;
+    public static int updateDelay = 12;
+    public static int frameDelay = 16;
+    public static int meteorSpriteSheetMax = 6;
+    public static boolean showFPS = true;
+    public static boolean debug = true;
 }
