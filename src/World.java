@@ -77,7 +77,7 @@ public class World {
                 Rock rock2 = rocks.get(j);
                 if (rock2.isExploding()) continue;
                 if (rock1.overlaps(rock2)) {
-                    Debug.log("Collision detected between rocks " + rock1.rockID + " and " + rock2.rockID);
+                    Debug.log("Hit: " + rock1.rockID + " vs " + rock2.rockID);
                     double speed1 = rock1.speed();
                     double speed2 = rock2.speed();
                     

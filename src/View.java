@@ -62,8 +62,9 @@ public class View extends JPanel {
                         
                 if (Config.debug) {
                     g.setColor(Color.WHITE);
-                    String info = String.format("ID:%d [%d,%d]", 
-                        rock.rockID, (int)rock.posX, (int)rock.posY);
+                    String info = String.format("ID:%d [%d,%d] Speed:%.1f Size:%d Type:%d", 
+                        rock.rockID, (int)rock.posX, (int)rock.posY,
+                        rock.speed(), rock.size, rock.getSpriteType());
                     Debug.log(info);
 
                     g.setColor(new Color(255, 0, 0, 50));
