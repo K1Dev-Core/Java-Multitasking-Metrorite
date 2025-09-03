@@ -1,6 +1,6 @@
 public class Config {
-    public static int screenWidth = 800;
-    public static int screenHeight = 900;
+    public static int screenWidth = 640;
+    public static int screenHeight = 960;
     public static int rockAmount = 12;
     public static int rockSizeMin = 20;
     public static int rockSizeMax = 30;
