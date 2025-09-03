@@ -63,6 +63,18 @@ public class View extends JPanel {
                 if (Config.debug) {
                     g.setColor(Color.WHITE);
                     g.drawString("ID:" + rock.rockID, (int)rock.posX - 10, (int)rock.posY - rock.size - 5);
+                    
+
+                    g.setColor(new Color(255, 0, 0, 50));
+                    g.drawOval((int)(rock.posX - rock.size), (int)(rock.posY - rock.size), 
+                             rock.size * 2, rock.size * 2);
+                             
+                   
+                    g.setColor(new Color(0, 255, 0, 100));
+                    int lineLength = 50;
+                    g.drawLine((int)rock.posX, (int)rock.posY,
+                             (int)(rock.posX + rock.speedX * lineLength),
+                             (int)(rock.posY + rock.speedY * lineLength));
                 }
             }
         }
