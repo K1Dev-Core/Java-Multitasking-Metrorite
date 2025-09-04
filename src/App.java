@@ -13,7 +13,7 @@ public class App {
         JFrame f = new JFrame("Meteor Game ( "+subtitle+" )");
         f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         View view = new View(w);
-    
+        f.setResizable(false);
         f.add(view);
         f.pack();
         f.setLocationRelativeTo(null);
