@@ -9,6 +9,8 @@ public class Sound {
     private static final byte[] dripData;
     private static final AudioFormat explosionFormat;
     private static final AudioFormat dripFormat;
+    public static float explosionVolume = 0.0f;
+    public static float dripVolume = -20.0f;
     private static long lastPlayTime = 0;
     private static final long MIN_INTERVAL = 20;
     

@@ -109,10 +109,12 @@ public class Rock implements Runnable {
     @Override
     public void run() {
         while (running) {
-            synchronized (this) {
-                move();
-                if (!isExploding) {
-                    bounceIfEdge();
+            if (!View.isPaused) {
+                synchronized (this) {
+                    move();
+                    if (!isExploding) {
+                        bounceIfEdge();
+                    }
                 }
             }
             try {
