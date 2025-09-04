@@ -48,6 +48,8 @@ public class Sound {
         soundPool.submit(() -> {
             try (SourceDataLine line = AudioSystem.getSourceDataLine(explosionFormat)) {
                 line.open(explosionFormat, explosionData.length);
+                FloatControl gainControl = (FloatControl) line.getControl(FloatControl.Type.MASTER_GAIN);
+                gainControl.setValue(explosionVolume);
                 line.start();
                 line.write(explosionData, 0, explosionData.length);
                 line.drain();
@@ -64,7 +66,7 @@ public class Sound {
             try (SourceDataLine line = AudioSystem.getSourceDataLine(dripFormat)) {
                 line.open(dripFormat, dripData.length);
                 FloatControl gainControl = (FloatControl) line.getControl(FloatControl.Type.MASTER_GAIN);
-                gainControl.setValue(-20.0f);
+                gainControl.setValue(dripVolume);
                 line.start();
                 line.write(dripData, 0, dripData.length);
                 line.drain();
