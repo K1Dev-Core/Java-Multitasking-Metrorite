@@ -66,6 +66,7 @@ public class View extends JPanel {
                         rock.rockID, (int)rock.posX, (int)rock.posY,
                         rock.speed(), rock.size, rock.getSpriteType());
                     Debug.log(info);
+                    g.drawString(info, (int)rock.posX + 1, (int)rock.posY + 1);
 
                     g.setColor(new Color(255, 0, 0, 50));
                     g.drawOval((int)(rock.posX - rock.size), (int)(rock.posY - rock.size), 
