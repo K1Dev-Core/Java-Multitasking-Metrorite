@@ -232,18 +232,12 @@ public class View extends JPanel {
             g.setColor(Color.WHITE);
             g.fill3DRect(speedHandle.x, speedHandle.y, speedHandle.width, speedHandle.height, true);
             
-            g.drawString("Auto Spawn (SPACE):", getWidth() / 2 - 200, 270);
-            g.setColor(autoSpawn ? Color.GREEN : Color.RED);
-            g.fillRect(getWidth() / 2 - 100, 275, 200, 20);
-            g.setColor(Color.WHITE);
-            g.drawString(autoSpawn ? "ON" : "OFF", getWidth() / 2 - 10, 290);
+            g.drawString("Background Music:", getWidth() / 2 - 200, 270);
             
-            g.drawString("Background Music:", getWidth() / 2 - 200, 320);
-            
-            bgSlider.setRect(getWidth() / 2 - 100, 325, 200, 8);
+            bgSlider.setRect(getWidth() / 2 - 100, 275, 200, 8);
             bgHandle.setRect(
                 getWidth() / 2 - 100 + ((Sound.bgVolume + 30) / 36.0f * 200) - 5,
-                321,
+                271,
                 10, 16
             );
             
@@ -251,6 +245,12 @@ public class View extends JPanel {
             g.fillRect(bgSlider.x, bgSlider.y, bgSlider.width, bgSlider.height);
             g.setColor(Color.WHITE);
             g.fill3DRect(bgHandle.x, bgHandle.y, bgHandle.width, bgHandle.height, true);
+            
+            g.drawString("Auto Spawn (SPACE):", getWidth() / 2 - 200, 320);
+            g.setColor(autoSpawn ? Color.GREEN : Color.RED);
+            g.fillRect(getWidth() / 2 - 100, 325, 200, 20);
+            g.setColor(Color.WHITE);
+            g.drawString(autoSpawn ? "ON" : "OFF", getWidth() / 2 - 10, 340);
         }
         Font originalFont = g.getFont();
         g.setColor(Color.white);

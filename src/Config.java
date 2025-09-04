@@ -14,4 +14,7 @@ public class Config {
     public static boolean showFPS = true;
     public static boolean debug = true;
     public static boolean debugViewMode = false;
+    public static float explosionVolumeDefault = -25.0f;
+    public static float dripVolumeDefault = -20.0f;
+    public static float bgVolumeDefault =-5.0f;
 }

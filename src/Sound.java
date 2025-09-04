@@ -11,9 +11,9 @@ public class Sound {
     private static final AudioFormat explosionFormat;
     private static final AudioFormat dripFormat;
     private static final AudioFormat bgFormat;
-    public static float explosionVolume = 0.0f;
-    public static float dripVolume = -20.0f;
-    public static float bgVolume = -15.0f;
+    public static float explosionVolume = Config.explosionVolumeDefault;
+    public static float dripVolume = Config.dripVolumeDefault;
+    public static float bgVolume = Config.bgVolumeDefault;
     private static Clip bgClip;
     private static long lastPlayTime = 0;
     private static final long MIN_INTERVAL = 20;
