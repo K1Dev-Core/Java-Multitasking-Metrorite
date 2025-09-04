@@ -7,18 +7,24 @@ public class Sound {
     private static final ExecutorService soundPool = Executors.newFixedThreadPool(MAX_SOUNDS);
     private static final byte[] explosionData;
     private static final byte[] dripData;
+    private static final byte[] bgData;
     private static final AudioFormat explosionFormat;
     private static final AudioFormat dripFormat;
+    private static final AudioFormat bgFormat;
     public static float explosionVolume = 0.0f;
     public static float dripVolume = -20.0f;
+    public static float bgVolume = -15.0f;
+    private static Clip bgClip;
     private static long lastPlayTime = 0;
     private static final long MIN_INTERVAL = 20;
     
     static {
         byte[] expData = null;
         byte[] drpData = null;
+        byte[] bgDataTemp = null;
         AudioFormat expFmt = null;
         AudioFormat drpFmt = null;
+        AudioFormat bgFmt = null;
         try {
             AudioInputStream expStream = AudioSystem.getAudioInputStream(new File("./res/sound/explosion.wav"));
             expFmt = expStream.getFormat();
@@ -29,13 +35,26 @@ public class Sound {
             drpFmt = dripStream.getFormat();
             drpData = dripStream.readAllBytes();
             dripStream.close();
+            
+            AudioInputStream bgStream = AudioSystem.getAudioInputStream(new File("./res/sound/bg.wav"));
+            bgFmt = bgStream.getFormat();
+            bgDataTemp = bgStream.readAllBytes();
+            bgStream.close();
+            
+            bgClip = AudioSystem.getClip();
+            bgClip.open(bgFmt, bgDataTemp, 0, bgDataTemp.length);
+            bgClip.loop(Clip.LOOP_CONTINUOUSLY);
+            FloatControl bgGainControl = (FloatControl) bgClip.getControl(FloatControl.Type.MASTER_GAIN);
+            bgGainControl.setValue(bgVolume);
         } catch (Exception e) {
             Debug.log("Error loading sounds: " + e.getMessage());
         }
         explosionData = expData;
         dripData = drpData;
+        bgData = bgDataTemp;
         explosionFormat = expFmt;
         dripFormat = drpFmt;
+        bgFormat = bgFmt;
     }
     
     public static void playExplosion() {
@@ -74,5 +93,24 @@ public class Sound {
                 Debug.log("Error playing sound: " + e.getMessage());
             }
         });
+    }
+    
+    public static void playBG() {
+        if (bgClip != null && !bgClip.isRunning()) {
+            bgClip.start();
+        }
+    }
+    
+    public static void stopBG() {
+        if (bgClip != null && bgClip.isRunning()) {
+            bgClip.stop();
+        }
+    }
+    
+    public static void updateBGVolume() {
+        if (bgClip != null) {
+            FloatControl gainControl = (FloatControl) bgClip.getControl(FloatControl.Type.MASTER_GAIN);
+            gainControl.setValue(bgVolume);
+        }
     }
 }

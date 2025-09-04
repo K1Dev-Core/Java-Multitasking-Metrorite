@@ -12,12 +12,15 @@ public class View extends JPanel {
     private Rectangle explosionSlider = new Rectangle();
     private Rectangle dripSlider = new Rectangle();
     private Rectangle speedSlider = new Rectangle();
+    private Rectangle bgSlider = new Rectangle();
     private Rectangle explosionHandle = new Rectangle();
     private Rectangle dripHandle = new Rectangle();
     private Rectangle speedHandle = new Rectangle();
+    private Rectangle bgHandle = new Rectangle();
     private boolean isDraggingExplosion = false;
     private boolean isDraggingDrip = false;
     private boolean isDraggingSpeed = false;
+    private boolean isDraggingBG = false;
     public static boolean autoSpawn = false;
     public static int rocksToSpawn = 0;
 
@@ -36,6 +39,7 @@ public class View extends JPanel {
                 }
             }
         }).start();
+        Sound.playBG();
         new Timer(Config.frameDelay, _ -> repaint()).start();
         
         addKeyListener(new KeyAdapter() {
@@ -83,6 +87,8 @@ public class View extends JPanel {
                             isDraggingDrip = true;
                         } else if (speedHandle.contains(e.getPoint())) {
                             isDraggingSpeed = true;
+                        } else if (bgHandle.contains(e.getPoint())) {
+                            isDraggingBG = true;
                         }
                     }
                 }
@@ -92,6 +98,7 @@ public class View extends JPanel {
                     isDraggingExplosion = false;
                     isDraggingDrip = false;
                     isDraggingSpeed = false;
+                    isDraggingBG = false;
                 }
             });
             
@@ -122,6 +129,11 @@ public class View extends JPanel {
                                     }
                                 }
                             }
+                            repaint();
+                        } else if (isDraggingBG) {
+                            float newVolume = ((e.getX() - (getWidth() / 2 - 100)) / 200.0f * 36.0f) - 30;
+                            Sound.bgVolume = Math.max(-30, Math.min(6, newVolume));
+                            Sound.updateBGVolume();
                             repaint();
                         }
                     }
@@ -225,6 +237,20 @@ public class View extends JPanel {
             g.fillRect(getWidth() / 2 - 100, 275, 200, 20);
             g.setColor(Color.WHITE);
             g.drawString(autoSpawn ? "ON" : "OFF", getWidth() / 2 - 10, 290);
+            
+            g.drawString("Background Music:", getWidth() / 2 - 200, 320);
+            
+            bgSlider.setRect(getWidth() / 2 - 100, 325, 200, 8);
+            bgHandle.setRect(
+                getWidth() / 2 - 100 + ((Sound.bgVolume + 30) / 36.0f * 200) - 5,
+                321,
+                10, 16
+            );
+            
+            g.setColor(new Color(100, 100, 100));
+            g.fillRect(bgSlider.x, bgSlider.y, bgSlider.width, bgSlider.height);
+            g.setColor(Color.WHITE);
+            g.fill3DRect(bgHandle.x, bgHandle.y, bgHandle.width, bgHandle.height, true);
         }
         Font originalFont = g.getFont();
         g.setColor(Color.white);
