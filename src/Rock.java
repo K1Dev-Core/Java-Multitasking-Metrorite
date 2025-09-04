@@ -131,7 +131,10 @@ public class Rock implements Runnable {
         if (posX + size > Config.screenWidth && speedX > 0) { speedX = -speedX; didBounce = true; }  // ชนขอบขวา
         if (posY - size < 0 && speedY < 0) { speedY = -speedY; didBounce = true; }  // ชนขอบบน
         if (posY + size > Config.screenHeight && speedY > 0) { speedY = -speedY; didBounce = true; }  // ชนขอบล่าง
-        if (didBounce) speedUp();  // ถ้าชนขอบให้เพิ่มความเร็ว
+        if (didBounce) {
+            Sound.playDrip();
+            speedUp();
+        }  // ถ้าชนขอบให้เพิ่มความเร็ว
     }
 
     // เพิ่มความเร็ว

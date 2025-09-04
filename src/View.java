@@ -51,7 +51,7 @@ public class View extends JPanel {
                 SpriteSheet.drawFrame(g, rock.getSpriteType(), rock.getCurrentFrame(),
                         (int) rock.posX, (int) rock.posY, rock.size);
                         
-                if (Config.debugviewmode) {
+                if (Config.debugViewMode) {
                     g.setColor(Color.WHITE);
                     String info = String.format("ID:%d [%d,%d] Speed:%.1f Size:%d Type:%d", 
                         rock.rockID, (int)rock.posX, (int)rock.posY,
