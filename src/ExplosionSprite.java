@@ -9,7 +9,7 @@ public class ExplosionSprite {
     private static final int FRAME_WIDTH = 400;
     private static final int FRAME_HEIGHT = 400;
     private static final int FRAMES_PER_ROW = 6;
-    private static final int TOTAL_FRAMES = 30;
+    public static final int TOTAL_FRAMES = 30;
     
     static {
         BufferedImage img = null;
@@ -22,7 +22,7 @@ public class ExplosionSprite {
     }
 
     public static void drawFrame(Graphics g, int frame, int x, int y, int size) {
-        frame = frame % TOTAL_FRAMES;
+        if (frame >= TOTAL_FRAMES) return;
         int row = frame / FRAMES_PER_ROW;
         int col = frame % FRAMES_PER_ROW;
         int srcX = col * FRAME_WIDTH + col;

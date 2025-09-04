@@ -1,4 +1,6 @@
-public class Rock {
+public class Rock implements Runnable {
+    private volatile boolean running = true;
+    private Thread thread;
     private static int rockCount = 0;  
     public final int rockID = rockCount++; 
     public double posX, posY;     
@@ -10,6 +12,10 @@ public class Rock {
     private final int spriteType;  
     private boolean isExploding;
     private int explosionFrame;
+    private boolean isSlowedDown;
+    private int slowDownTimer;
+    private double originalSpeedX;
+    private double originalSpeedY;
     
 
 
@@ -23,6 +29,10 @@ public class Rock {
         this.spriteType = rockID % Config.meteorSpriteSheetMax;
         this.isExploding = false;
         this.explosionFrame = 0;
+        this.isSlowedDown = false;
+        this.slowDownTimer = 0;
+        this.originalSpeedX = dx;
+        this.originalSpeedY = dy;
     }
 
     public void explode() {
@@ -37,8 +47,8 @@ public class Rock {
         return isExploding;
     }
 
-    public boolean isExplodeFinished() {
-        return isExploding && explosionFrame >= 30;
+    public synchronized boolean isExplodeFinished() {
+        return !running && isExploding;
     }
 
     public int getExplosionFrame() {
@@ -50,15 +60,28 @@ public class Rock {
         return Math.sqrt(speedX * speedX + speedY * speedY); 
     }
 
-        public void move() {
+
+        public synchronized void move() {
         if (!isExploding) {
             posX += speedX;  
             posY += speedY;  
+            
+            if (isSlowedDown) {
+                slowDownTimer--;
+                if (slowDownTimer <= 0) {
+                    isSlowedDown = false;
+                    speedX = originalSpeedX;
+                    speedY = originalSpeedY;
+                }
+            }
             
             double speedMultiplier = speed() / Config.rockSpeedMin; 
             animationTime += Config.updateDelay / 1000.0 * speedMultiplier;  
         } else {
             explosionFrame++;
+            if (explosionFrame >= 30) {
+                running = false;
+            }
         }
     }
 
@@ -69,6 +92,36 @@ public class Rock {
 
     public int getSpriteType() {
         return spriteType;
+    }
+    
+    public void startThread() {
+        thread = new Thread(this);
+        thread.start();
+    }
+    
+    public void stopThread() {
+        running = false;
+        if (thread != null) {
+            thread.interrupt();
+        }
+    }
+    
+    @Override
+    public void run() {
+        while (running) {
+            synchronized (this) {
+                move();
+                if (!isExploding) {
+                    bounceIfEdge();
+                }
+            }
+            try {
+                Thread.sleep(Config.updateDelay);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                break;
+            }
+        }
     }
 
     // เด้งกลับถ้าชนขอบจอ
@@ -87,20 +140,42 @@ public class Rock {
         speedY *= Config.rockSpeedUpRate; 
         double currentSpeed = speed();
         if (currentSpeed > Config.rockMaxSpeed) {  
-
             speedX = speedX * Config.rockMaxSpeed / currentSpeed;
             speedY = speedY * Config.rockMaxSpeed / currentSpeed;
         }
+        
+   
+        if (!isSlowedDown) {
+            originalSpeedX = speedX;
+            originalSpeedY = speedY;
+        }
     }
+
+
 
     // เช้คว่าอุกกาบาตนี้ชนกับอีกก้อนมั้ย
     // สูตร: distance = √((x1 - x2)² + (y1 - y2)²)
     // ถ้า distance ≤ r1 + r2 แปลว่าชนกัน
     public boolean overlaps(Rock otherRock) {
- 
         double dx = posX - otherRock.posX;
         double dy = posY - otherRock.posY;
         double distance = Math.sqrt(dx * dx + dy * dy);
-        return distance <= size + otherRock.size;  
+        boolean doesOverlap = distance <= size + otherRock.size;
+        
+        if (doesOverlap && !isSlowedDown && !otherRock.isSlowedDown) {
+            slowDown();
+            otherRock.slowDown();
+        }
+        
+        return doesOverlap;
+    }
+    
+    public void slowDown() {
+        if (!isSlowedDown) {
+            isSlowedDown = true;
+            slowDownTimer = 20;
+            speedX *= 0.5;
+            speedY *= 0.5;
+        }
     }
 }

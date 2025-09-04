@@ -13,4 +13,5 @@ public class Config {
     public static int meteorSpriteSheetMax = 7;
     public static boolean showFPS = true;
     public static boolean debug = true;
+    public static boolean debugviewmode = false;
 }

@@ -29,7 +29,7 @@ public class Background {
             }
             
 
-            int blendSize = 60;
+            int blendSize = 100;
             float[] scales = new float[blendSize];
             for (int i = 0; i < blendSize; i++) {
                 scales[i] = (float)Math.sin((i / (float)blendSize) * Math.PI/2);

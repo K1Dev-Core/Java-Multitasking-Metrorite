@@ -16,10 +16,11 @@ public class Explosion {
     }
     
     public void update() {
-        frame++;
-        if (frame >= 29) {
-            isFinished = true;
-            frame = 29;
+        if (!isFinished) {
+            frame++;
+            if (frame >= ExplosionSprite.TOTAL_FRAMES) {
+                isFinished = true;
+            }
         }
     }
     

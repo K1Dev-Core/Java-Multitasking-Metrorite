@@ -24,27 +24,18 @@ public class View extends JPanel {
             setCursor(customCursor); 
         } catch (IOException e) {
             Debug.log("Error loading crosshair: " + e.getMessage());
-        }
-
-
-        if (Config.debug){
+        }if (Config.debug){
             addMouseListener(new java.awt.event.MouseAdapter() {
+                @Override
                 public void mouseClicked(java.awt.event.MouseEvent e) {
-
                     int mouseX = e.getX();
                     int mouseY = e.getY();
-
                     if (e.getButton() == java.awt.event.MouseEvent.BUTTON1) {
-
                         world.explosions.add(new Explosion(mouseX, mouseY));
                     } else if (e.getButton() == java.awt.event.MouseEvent.BUTTON3) {
-
                         world.addNewRock(mouseX, mouseY);
-                    }
-                }
-            });
+                    }        }    });
         }
-
     }
 
     @Override
@@ -60,7 +51,7 @@ public class View extends JPanel {
                 SpriteSheet.drawFrame(g, rock.getSpriteType(), rock.getCurrentFrame(),
                         (int) rock.posX, (int) rock.posY, rock.size);
                         
-                if (Config.debug) {
+                if (Config.debugviewmode) {
                     g.setColor(Color.WHITE);
                     String info = String.format("ID:%d [%d,%d] Speed:%.1f Size:%d Type:%d", 
                         rock.rockID, (int)rock.posX, (int)rock.posY,
@@ -78,15 +69,12 @@ public class View extends JPanel {
                     g.drawLine((int)rock.posX, (int)rock.posY,
                              (int)(rock.posX + rock.speedX * lineLength),
                              (int)(rock.posY + rock.speedY * lineLength));
-                }
-            }
+                }    }
         }
-        
 
         for (Explosion exp : world.explosions) {
             exp.draw(g);
         }
-        
         g.setColor(Color.white);
         g.drawString("Alive: " + world.alive(), 10, 20);
         if (Config.showFPS) g.drawString(String.format("FPS: %.1f", world.fps()), 10, 38);

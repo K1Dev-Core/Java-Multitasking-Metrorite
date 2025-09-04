@@ -8,8 +8,16 @@ public class World {
     private final long startTime = System.nanoTime();
 
     public void init() {
+        for (Rock rock : rocks) {
+            rock.stopThread();
+        }
         rocks.clear();
-        for (int i = 0; i < Config.rockAmount; i++) rocks.add(makeRock(i));
+        explosions.clear();
+        for (int i = 0; i < Config.rockAmount; i++) {
+            Rock rock = makeRock(i);
+            rocks.add(rock);
+            rock.startThread();
+        }
     }
 
     private Rock makeRock(int i) {
@@ -29,33 +37,38 @@ public class World {
         double speed = Config.rockSpeedMin + rand.nextDouble() * (Config.rockSpeedMax - Config.rockSpeedMin);
         double speedX = Math.cos(angle) * speed;
         double speedY = Math.sin(angle) * speed;
-        rocks.add(new Rock(x, y, speedX, speedY, rockSize));
+        Rock rock = new Rock(x, y, speedX, speedY, rockSize);
+        rocks.add(rock);
+        rock.startThread();
     }
 
     public void update() {
         Background.update();
-        rocks.removeIf(Rock::isExplodeFinished);
         
-
-        for (Rock a : rocks) a.move();
-        for (Rock a : rocks) a.bounceIfEdge();
+        rocks.removeIf(rock -> {
+            if (rock.isExplodeFinished()) {
+                rock.stopThread();
+                return true;
+            }
+            return false;
+        });
+        
         resolveHits();
         
 
-        Iterator<Explosion> it = explosions.iterator();
-        while (it.hasNext()) {
+        for (Iterator<Explosion> it = explosions.iterator(); it.hasNext();) {
             Explosion exp = it.next();
             exp.update();
             
-
+            if (exp.isFinished()) {
+                it.remove();
+                continue;
+            }
+            
             for (Rock rock : rocks) {
                 if (!rock.isExploding() && exp.hits(rock)) {
                     rock.explode();
                 }
-            }
-            
-            if (exp.isFinished()) {
-                it.remove();
             }
         }
         
@@ -64,11 +77,6 @@ public class World {
 
     private void resolveHits() {
         if (rocks.size() <= 1) return;
-        Set<Rock> rocksToRemove = new HashSet<>();
-        
-
-        rocks.removeIf(Rock::isExplodeFinished);
-        
         int totalRocks = rocks.size();
         for (int i = 0; i < totalRocks; i++) {
             Rock rock1 = rocks.get(i);
@@ -81,7 +89,7 @@ public class World {
                     double speed1 = rock1.speed();
                     double speed2 = rock2.speed();
                     
-                    if (Math.abs(speed1 - speed2) < 1e-9) {
+                    if (Math.abs(speed1 - speed2) < 0.000000001) {
                         if (rock1.rockID > rock2.rockID) {
                             rock1.explode();
                         } else {
@@ -97,11 +105,16 @@ public class World {
                 }
             }
         }
-        if (!rocksToRemove.isEmpty()) rocks.removeAll(rocksToRemove);
     }
 
     public int alive() {
-        return rocks.size();
+        int count = 0;
+        for (Rock rock : rocks) {
+            if (!rock.isExploding()) {
+                count++;
+            }
+        }
+        return count;
     }
 
     public double fps() {
