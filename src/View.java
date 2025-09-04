@@ -11,15 +11,31 @@ public class View extends JPanel {
     public static volatile boolean isPaused = false;
     private Rectangle explosionSlider = new Rectangle();
     private Rectangle dripSlider = new Rectangle();
+    private Rectangle speedSlider = new Rectangle();
     private Rectangle explosionHandle = new Rectangle();
     private Rectangle dripHandle = new Rectangle();
+    private Rectangle speedHandle = new Rectangle();
     private boolean isDraggingExplosion = false;
     private boolean isDraggingDrip = false;
+    private boolean isDraggingSpeed = false;
+    public static boolean autoSpawn = false;
+    public static int rocksToSpawn = 0;
 
     public View(World world) {
         this.world = world;
         setPreferredSize(new Dimension(Config.screenWidth, Config.screenHeight));
-        new Timer(Config.updateDelay, _ -> { if (!isPaused) world.update(); }).start();
+        new Timer(Config.updateDelay, _ -> { 
+            if (!isPaused) {
+                world.update();
+                if (autoSpawn && rocksToSpawn > 0) {
+                    world.addNewRock(
+                        (int)(Math.random() * (Config.screenWidth - 100)) + 50,
+                        (int)(Math.random() * (Config.screenHeight - 100)) + 50
+                    );
+                    rocksToSpawn--;
+                }
+            }
+        }).start();
         new Timer(Config.frameDelay, _ -> repaint()).start();
         
         addKeyListener(new KeyAdapter() {
@@ -27,6 +43,13 @@ public class View extends JPanel {
             public void keyPressed(KeyEvent e) {
                 if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
                     isPaused = !isPaused;
+                    repaint();
+                }
+                if (e.getKeyCode() == KeyEvent.VK_SPACE) {
+                    autoSpawn = !autoSpawn;
+                    if (autoSpawn) {
+                        rocksToSpawn = 1;
+                    }
                     repaint();
                 }
             }
@@ -58,6 +81,8 @@ public class View extends JPanel {
                             isDraggingExplosion = true;
                         } else if (dripHandle.contains(e.getPoint())) {
                             isDraggingDrip = true;
+                        } else if (speedHandle.contains(e.getPoint())) {
+                            isDraggingSpeed = true;
                         }
                     }
                 }
@@ -66,6 +91,7 @@ public class View extends JPanel {
                 public void mouseReleased(MouseEvent e) {
                     isDraggingExplosion = false;
                     isDraggingDrip = false;
+                    isDraggingSpeed = false;
                 }
             });
             
@@ -80,6 +106,22 @@ public class View extends JPanel {
                         } else if (isDraggingDrip) {
                             float newVolume = ((e.getX() - (getWidth() / 2 - 100)) / 200.0f * 36.0f) - 30;
                             Sound.dripVolume = Math.max(-30, Math.min(6, newVolume));
+                            repaint();
+                        } else if (isDraggingSpeed) {
+                            float newSpeed = ((e.getX() - (getWidth() / 2 - 100)) / 200.0f * 3.0f) + 0.5f;
+                            Config.rockSpeedMin = Math.max(0.5f, Math.min(3.5f, newSpeed));
+                            Config.rockSpeedMax = Config.rockSpeedMin + 2.0f;
+                            
+                            for (Rock rock : world.rocks) {
+                                if (!rock.isExploding()) {
+                                    double currentSpeed = rock.speed();
+                                    if (currentSpeed > 0) {
+                                        double ratio = (Config.rockSpeedMin + (Config.rockSpeedMax - Config.rockSpeedMin) / 2) / currentSpeed;
+                                        rock.speedX *= ratio;
+                                        rock.speedY *= ratio;
+                                    }
+                                }
+                            }
                             repaint();
                         }
                     }
@@ -131,7 +173,7 @@ public class View extends JPanel {
             g.fillRect(0, 0, getWidth(), getHeight());
             g.setColor(Color.WHITE);
             g.setFont(new Font("Arial", Font.BOLD, 48));
-            String text = "PAUSED";
+            String text = "PAUSED [DebugMode]";
             FontMetrics fm = g.getFontMetrics();
             g.drawString(text, (getWidth() - fm.stringWidth(text)) / 2, 100);
             
@@ -163,6 +205,26 @@ public class View extends JPanel {
             g.fillRect(dripSlider.x, dripSlider.y, dripSlider.width, dripSlider.height);
             g.setColor(Color.WHITE);
             g.fill3DRect(dripHandle.x, dripHandle.y, dripHandle.width, dripHandle.height, true);
+            
+            g.drawString("Rock Speed:", getWidth() / 2 - 200, 230);
+            
+            speedSlider.setRect(getWidth() / 2 - 100, 235, 200, 8);
+            speedHandle.setRect(
+                getWidth() / 2 - 100 + ((Config.rockSpeedMin - 0.5f) / 3.0f * 200) - 5,
+                231,
+                10, 16
+            );
+            
+            g.setColor(new Color(100, 100, 100));
+            g.fillRect(speedSlider.x, speedSlider.y, speedSlider.width, speedSlider.height);
+            g.setColor(Color.WHITE);
+            g.fill3DRect(speedHandle.x, speedHandle.y, speedHandle.width, speedHandle.height, true);
+            
+            g.drawString("Auto Spawn (SPACE):", getWidth() / 2 - 200, 270);
+            g.setColor(autoSpawn ? Color.GREEN : Color.RED);
+            g.fillRect(getWidth() / 2 - 100, 275, 200, 20);
+            g.setColor(Color.WHITE);
+            g.drawString(autoSpawn ? "ON" : "OFF", getWidth() / 2 - 10, 290);
         }
         Font originalFont = g.getFont();
         g.setColor(Color.white);

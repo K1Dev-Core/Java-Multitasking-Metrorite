@@ -48,6 +48,9 @@ public class World {
         rocks.removeIf(rock -> {
             if (rock.isExplodeFinished()) {
                 rock.stopThread();
+                if (View.autoSpawn) {
+                    View.rocksToSpawn++;
+                }
                 return true;
             }
             return false;
