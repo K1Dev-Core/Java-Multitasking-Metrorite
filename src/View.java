@@ -256,7 +256,7 @@ public class View extends JPanel {
         g.setColor(Color.white);
         g.setFont(new Font("Arial", Font.PLAIN, 16));
         g.drawString("Alive: " + world.alive(), 10, 20);
-        if (Config.showFPS) g.drawString(String.format("FPS: %.1f", world.fps()), 10, 38);
+        if (Config.showFPS) g.drawString(String.format("FPS: %.0f", world.fps()), 10, 38);
         g.setFont(originalFont);
     }
 }

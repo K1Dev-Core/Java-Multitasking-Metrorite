@@ -18,5 +18,12 @@ public class App {
         f.pack();
         f.setLocationRelativeTo(null);
         f.setVisible(true);
+        
+        f.addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowClosing(java.awt.event.WindowEvent e) {
+                Sound.shutdown();
+                System.exit(0);
+            }
+        });
     }
 }

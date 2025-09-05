@@ -12,7 +12,9 @@ public class Explosion {
         this.size = 40;
         this.frame = 0;
         this.done = false;
-        Sound.playExplosion();
+        if (!View.paused) {
+            Sound.playExplosion();
+        }
     }
     
     public void update() {

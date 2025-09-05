@@ -5,7 +5,8 @@ public class World {
     public final java.util.List<Explosion> explosions = new ArrayList<>();
     private final Random rand = new Random();
     private long frames;
-    private final long start = System.nanoTime();
+    private long lastTime = System.currentTimeMillis();
+    private double fps = 0;
 
     public void init() {
         for (Rock rock : rocks) {
@@ -76,6 +77,13 @@ public class World {
         }
         
         frames++;
+        
+        long now = System.currentTimeMillis();
+        if (now - lastTime >= 1000) {
+            fps = frames * 1000.0 / (now - lastTime);
+            frames = 0;
+            lastTime = now;
+        }
     }
 
     private void resolveHits() {
@@ -121,9 +129,6 @@ public class World {
     }
 
     public double fps() {
-        if (!Config.showFPS) return 0;
-        long now = System.nanoTime();
-        double sec = (now - start) / 1_000_000_000.0;
-        return sec > 0 ? frames / sec : 0;
+        return Config.showFPS ? fps : 0;
     }
 }

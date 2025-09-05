@@ -16,7 +16,7 @@ public class Sound {
     public static float bgVol = Config.bgVol;
     private static Clip bgClip;
     private static long lastTime = 0;
-    private static final long MIN_INTERVAL = 20;
+    private static final long MIN_INTERVAL = 100;
     
     static {
         byte[] exp = null;
@@ -61,38 +61,44 @@ public class Sound {
         if (expData == null || expFmt == null) return;
         
         long now = System.currentTimeMillis();
-        if (now - lastTime < MIN_INTERVAL) return;
+        if (now - lastTime < 100) return;
         lastTime = now;
         
-        pool.submit(() -> {
-            try (SourceDataLine line = AudioSystem.getSourceDataLine(expFmt)) {
-                line.open(expFmt, expData.length);
-                FloatControl gainControl = (FloatControl) line.getControl(FloatControl.Type.MASTER_GAIN);
-                gainControl.setValue(expVol);
-                line.start();
-                line.write(expData, 0, expData.length);
-                line.drain();
-            } catch (Exception e) {
-                Debug.log("Error playing sound: " + e.getMessage());
-            }
-        });
+        try {
+            pool.submit(() -> {
+                try (SourceDataLine line = AudioSystem.getSourceDataLine(expFmt)) {
+                    line.open(expFmt, expData.length);
+                    FloatControl gainControl = (FloatControl) line.getControl(FloatControl.Type.MASTER_GAIN);
+                    gainControl.setValue(expVol);
+                    line.start();
+                    line.write(expData, 0, expData.length);
+                    line.drain();
+                } catch (Exception e) {
+                    Debug.log("Error playing sound: " + e.getMessage());
+                }
+            });
+        } catch (Exception e) {
+        }
     }
     
     public static void playDrip() {
         if (dripData == null || dripFmt == null) return;
         
-        pool.submit(() -> {
-            try (SourceDataLine line = AudioSystem.getSourceDataLine(dripFmt)) {
-                line.open(dripFmt, dripData.length);
-                FloatControl gainControl = (FloatControl) line.getControl(FloatControl.Type.MASTER_GAIN);
-                gainControl.setValue(dripVol);
-                line.start();
-                line.write(dripData, 0, dripData.length);
-                line.drain();
-            } catch (Exception e) {
-                Debug.log("Error playing sound: " + e.getMessage());
-            }
-        });
+        try {
+            pool.submit(() -> {
+                try (SourceDataLine line = AudioSystem.getSourceDataLine(dripFmt)) {
+                    line.open(dripFmt, dripData.length);
+                    FloatControl gainControl = (FloatControl) line.getControl(FloatControl.Type.MASTER_GAIN);
+                    gainControl.setValue(dripVol);
+                    line.start();
+                    line.write(dripData, 0, dripData.length);
+                    line.drain();
+                } catch (Exception e) {
+                    Debug.log("Error playing sound: " + e.getMessage());
+                }
+            });
+        } catch (Exception e) {
+        }
     }
     
     public static void playBG() {
@@ -105,6 +111,16 @@ public class Sound {
         if (bgClip != null && bgClip.isRunning()) {
             bgClip.stop();
         }
+    }
+    
+    public static void stopAll() {
+        if (bgClip != null) {
+            bgClip.stop();
+        }
+    }
+    
+    public static void shutdown() {
+        pool.shutdownNow();
     }
     
     public static void updateBGVolume() {

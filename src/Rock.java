@@ -39,7 +39,9 @@ public class Rock implements Runnable {
         if (!isExploding) {
             isExploding = true;
             explosionFrame = 0;
-            Sound.playExplosion();
+            if (!View.paused) {
+                Sound.playExplosion();
+            }
         }
     }
 
@@ -145,7 +147,9 @@ public class Rock implements Runnable {
             didBounce = true;
         }  // ชนขอบล่าง
         if (didBounce) {
-            Sound.playDrip();
+            if (!View.paused) {
+                Sound.playDrip();
+            }
             speedUp();
         }  // ถ้าชนขอบให้เพิ่มความเร็ว
     }
