@@ -1,20 +1,20 @@
 public class Config {
-    public static int screenWidth = 640;
-    public static int screenHeight = 960;
-    public static int rockAmount = 12;
-    public static int rockSizeMin = 20;
-    public static int rockSizeMax = 30;
-    public static double rockSpeedMin = 1.2;
-    public static double rockSpeedMax = 3.2;
-    public static double rockSpeedUpRate = 1.08;
-    public static double rockMaxSpeed = 8.0;
-    public static int updateDelay = 12;
-    public static int frameDelay = 16;
-    public static int meteorSpriteSheetMax = 7;
+    public static int w = 640;
+    public static int h = 960;
+    public static int rockCount = 12;
+    public static int rockMin = 20;
+    public static int rockMax = 30;
+    public static double speedMin = 1.2;
+    public static double speedMax = 3.2;
+    public static double speedUp = 1.08;
+    public static double speedLimit = 8.0;
+    public static int updateTime = 12;
+    public static int frameTime = 16;
+    public static int spriteCount = 7;
     public static boolean showFPS = true;
     public static boolean debug = true;
-    public static boolean debugViewMode = false;
-    public static float explosionVolumeDefault = -25.0f;
-    public static float dripVolumeDefault = -20.0f;
-    public static float bgVolumeDefault =-5.0f;
+    public static boolean debugMode = false;
+    public static float expVol = -25.0f;
+    public static float dripVol = -20.0f;
+    public static float bgVol = -5.0f;
 }

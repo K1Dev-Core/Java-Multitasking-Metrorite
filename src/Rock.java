@@ -1,23 +1,23 @@
+
 public class Rock implements Runnable {
+
     private volatile boolean running = true;
     private Thread thread;
-    private static int rockCount = 0;  
-    public final int rockID = rockCount++; 
-    public double posX, posY;     
-    public double speedX, speedY; 
-    public int size;          
-    private double animationTime;  
-    private static final double ANIMATION_SPEED = 0.2; 
+    private static int rockCount = 0;
+    public final int rockID = rockCount++;
+    public double posX, posY;
+    public double speedX, speedY;
+    public int size;
+    private double animationTime;
+    private static final double ANIMATION_SPEED = 0.2;
     private static final int TOTAL_FRAMES = 3;
-    private final int spriteType;  
+    private final int spriteType;
     private boolean isExploding;
     private int explosionFrame;
     private boolean isSlowedDown;
     private int slowDownTimer;
     private double originalSpeedX;
     private double originalSpeedY;
-    
-
 
     public Rock(double x, double y, double dx, double dy, int r) {
         this.posX = x;
@@ -26,7 +26,7 @@ public class Rock implements Runnable {
         this.speedY = dy;
         this.size = r;
         this.animationTime = Math.random() * ANIMATION_SPEED;
-        this.spriteType = rockID % Config.meteorSpriteSheetMax;
+        this.spriteType = rockID % Config.spriteCount;
         this.isExploding = false;
         this.explosionFrame = 0;
         this.isSlowedDown = false;
@@ -57,15 +57,14 @@ public class Rock implements Runnable {
 
     // ความเร็ว = √(speedX² + speedY²)
     public double speed() {
-        return Math.sqrt(speedX * speedX + speedY * speedY); 
+        return Math.sqrt(speedX * speedX + speedY * speedY);
     }
 
-
-        public synchronized void move() {
+    public synchronized void move() {
         if (!isExploding) {
-            posX += speedX;  
-            posY += speedY;  
-            
+            posX += speedX;
+            posY += speedY;
+
             if (isSlowedDown) {
                 slowDownTimer--;
                 if (slowDownTimer <= 0) {
@@ -74,9 +73,9 @@ public class Rock implements Runnable {
                     speedY = originalSpeedY;
                 }
             }
-            
-            double speedMultiplier = speed() / Config.rockSpeedMin; 
-            animationTime += Config.updateDelay / 1000.0 * speedMultiplier;  
+
+            double speedMultiplier = speed() / Config.speedMin;
+            animationTime += Config.updateTime / 1000.0 * speedMultiplier;
         } else {
             explosionFrame++;
             if (explosionFrame >= 30) {
@@ -85,31 +84,31 @@ public class Rock implements Runnable {
         }
     }
 
-        public int getCurrentFrame() {
-        double normalizedTime = (animationTime / ANIMATION_SPEED) % 1.0; 
-        return (int)(normalizedTime * TOTAL_FRAMES);
+    public int getCurrentFrame() {
+        double normalizedTime = (animationTime / ANIMATION_SPEED) % 1.0;
+        return (int) (normalizedTime * TOTAL_FRAMES);
     }
 
     public int getSpriteType() {
         return spriteType;
     }
-    
+
     public void startThread() {
         thread = new Thread(this);
         thread.start();
     }
-    
+
     public void stopThread() {
         running = false;
         if (thread != null) {
             thread.interrupt();
         }
     }
-    
+
     @Override
     public void run() {
         while (running) {
-            if (!View.isPaused) {
+            if (!View.paused) {
                 synchronized (this) {
                     move();
                     if (!isExploding) {
@@ -118,7 +117,7 @@ public class Rock implements Runnable {
                 }
             }
             try {
-                Thread.sleep(Config.updateDelay);
+                Thread.sleep(Config.updateTime);
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
                 break;
@@ -129,10 +128,22 @@ public class Rock implements Runnable {
     // เด้งกลับถ้าชนขอบจอ
     public void bounceIfEdge() {
         boolean didBounce = false;
-        if (posX - size < 0 && speedX < 0) { speedX = -speedX; didBounce = true; }  // ชนขอบซ้าย
-        if (posX + size > Config.screenWidth && speedX > 0) { speedX = -speedX; didBounce = true; }  // ชนขอบขวา
-        if (posY - size < 0 && speedY < 0) { speedY = -speedY; didBounce = true; }  // ชนขอบบน
-        if (posY + size > Config.screenHeight && speedY > 0) { speedY = -speedY; didBounce = true; }  // ชนขอบล่าง
+        if (posX - size < 0 && speedX < 0) {
+            speedX = -speedX;
+            didBounce = true;
+        }  // ชนขอบซ้าย
+        if (posX + size > Config.w && speedX > 0) {
+            speedX = -speedX;
+            didBounce = true;
+        }  // ชนขอบขวา
+        if (posY - size < 0 && speedY < 0) {
+            speedY = -speedY;
+            didBounce = true;
+        }  // ชนขอบบน
+        if (posY + size > Config.h && speedY > 0) {
+            speedY = -speedY;
+            didBounce = true;
+        }  // ชนขอบล่าง
         if (didBounce) {
             Sound.playDrip();
             speedUp();
@@ -141,22 +152,19 @@ public class Rock implements Runnable {
 
     // เพิ่มความเร็ว
     private void speedUp() {
-        speedX *= Config.rockSpeedUpRate;  
-        speedY *= Config.rockSpeedUpRate; 
+        speedX *= Config.speedUp;
+        speedY *= Config.speedUp;
         double currentSpeed = speed();
-        if (currentSpeed > Config.rockMaxSpeed) {  
-            speedX = speedX * Config.rockMaxSpeed / currentSpeed;
-            speedY = speedY * Config.rockMaxSpeed / currentSpeed;
+        if (currentSpeed > Config.speedLimit) {
+            speedX = speedX * Config.speedLimit / currentSpeed;
+            speedY = speedY * Config.speedLimit / currentSpeed;
         }
-        
-   
+
         if (!isSlowedDown) {
             originalSpeedX = speedX;
             originalSpeedY = speedY;
         }
     }
-
-
 
     // เช้คว่าอุกกาบาตนี้ชนกับอีกก้อนมั้ย
     // สูตร: distance = √((x1 - x2)² + (y1 - y2)²)
@@ -166,15 +174,15 @@ public class Rock implements Runnable {
         double dy = posY - otherRock.posY;
         double distance = Math.sqrt(dx * dx + dy * dy);
         boolean doesOverlap = distance <= size + otherRock.size;
-        
+
         if (doesOverlap && !isSlowedDown && !otherRock.isSlowedDown) {
             slowDown();
             otherRock.slowDown();
         }
-        
+
         return doesOverlap;
     }
-    
+
     public void slowDown() {
         if (!isSlowedDown) {
             isSlowedDown = true;

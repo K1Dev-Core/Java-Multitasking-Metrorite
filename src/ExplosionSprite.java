@@ -5,10 +5,10 @@ import java.io.IOException;
 import javax.imageio.ImageIO;
 
 public class ExplosionSprite {
-    private static final BufferedImage spritesheet;
-    private static final int FRAME_WIDTH = 400;
-    private static final int FRAME_HEIGHT = 400;
-    private static final int FRAMES_PER_ROW = 6;
+    private static final BufferedImage sheet;
+    private static final int W = 400;
+    private static final int H = 400;
+    private static final int PER_ROW = 6;
     public static final int TOTAL_FRAMES = 30;
     
     static {
@@ -18,19 +18,19 @@ public class ExplosionSprite {
         } catch (IOException e) {
             Debug.log("Error loading explosion sprite: " + e.getMessage());
         }
-        spritesheet = img;
+        sheet = img;
     }
 
     public static void drawFrame(Graphics g, int frame, int x, int y, int size) {
         if (frame >= TOTAL_FRAMES) return;
-        int row = frame / FRAMES_PER_ROW;
-        int col = frame % FRAMES_PER_ROW;
-        int srcX = col * FRAME_WIDTH + col;
-        int srcY = row * FRAME_HEIGHT + row;
+        int row = frame / PER_ROW;
+        int col = frame % PER_ROW;
+        int srcX = col * W + col;
+        int srcY = row * H + row;
         
-        g.drawImage(spritesheet,
+        g.drawImage(sheet,
             x - size, y - size, x + size, y + size,
-            srcX, srcY, srcX + FRAME_WIDTH, srcY + FRAME_HEIGHT,
+            srcX, srcY, srcX + W, srcY + H,
             null
         );
     }

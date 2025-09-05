@@ -5,30 +5,29 @@ import java.io.IOException;
 import javax.imageio.ImageIO;
 
 public class SpriteSheet {
-    private static final BufferedImage[] spriteSheets = new BufferedImage[Config.meteorSpriteSheetMax];
-    private static final int FRAME_WIDTH = 32;
-    private static final int FRAME_HEIGHT = 32;
-
+    private static final BufferedImage[] sheets = new BufferedImage[Config.spriteCount];
+    private static final int W = 32;
+    private static final int H = 32;
     private static final int TOTAL_FRAMES = 3;
     
     static {
-        for (int i = 0; i < Config.meteorSpriteSheetMax; i++) {
+        for (int i = 0; i < Config.spriteCount; i++) {
             try {
-                spriteSheets[i] = ImageIO.read(new File("./res/meteor/" + (i+1) + "-sprite-sheet.png"));
+                sheets[i] = ImageIO.read(new File("./res/meteor/" + (i+1) + "-sprite-sheet.png"));
             } catch (IOException e) {
                 Debug.log("Error loading sprite sheet " + (i+1) + ": " + e.getMessage());
             }
         }
     }
 
-    public static void drawFrame(Graphics g, int spriteType, int frame, int x, int y, int size) {
+    public static void drawFrame(Graphics g, int type, int frame, int x, int y, int size) {
         frame = frame % TOTAL_FRAMES;
-        int srcX = frame * (FRAME_WIDTH + 1);  
+        int srcX = frame * (W + 1);  
         int srcY = 0;
         
-        g.drawImage(spriteSheets[spriteType],
+        g.drawImage(sheets[type],
             x - size, y - size, x + size, y + size,
-            srcX, srcY, srcX + FRAME_WIDTH, srcY + FRAME_HEIGHT,
+            srcX, srcY, srcX + W, srcY + H,
             null
         );
     }

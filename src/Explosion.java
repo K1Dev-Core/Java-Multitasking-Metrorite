@@ -1,25 +1,25 @@
 import java.awt.*;
 
 public class Explosion {
-    private int x, y;
+    private final int x, y;
     private int frame;
     private final int size;
-    private boolean isFinished;
+    private boolean done;
     
     public Explosion(int x, int y) {
         this.x = x;
         this.y = y;
-        this.size = 40; // ขนาดการระเบิด
+        this.size = 40;
         this.frame = 0;
-        this.isFinished = false;
+        this.done = false;
         Sound.playExplosion();
     }
     
     public void update() {
-        if (!isFinished) {
+        if (!done) {
             frame++;
             if (frame >= ExplosionSprite.TOTAL_FRAMES) {
-                isFinished = true;
+                done = true;
             }
         }
     }
@@ -29,13 +29,13 @@ public class Explosion {
     }
     
     public boolean isFinished() {
-        return isFinished;
+        return done;
     }
 
     public boolean hits(Rock rock) {
         double dx = x - rock.posX;
         double dy = y - rock.posY;
-        double distance = Math.sqrt(dx * dx + dy * dy);
-        return distance <= size + rock.size + 1.5;
+        double dist = Math.sqrt(dx * dx + dy * dy);
+        return dist <= size + rock.size + 1.5;
     }
 }

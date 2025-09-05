@@ -4,8 +4,8 @@ public class World {
     public final java.util.List<Rock> rocks = new ArrayList<>();
     public final java.util.List<Explosion> explosions = new ArrayList<>();
     private final Random rand = new Random();
-    private long frameCount;
-    private final long startTime = System.nanoTime();
+    private long frames;
+    private final long start = System.nanoTime();
 
     public void init() {
         for (Rock rock : rocks) {
@@ -13,7 +13,7 @@ public class World {
         }
         rocks.clear();
         explosions.clear();
-        for (int i = 0; i < Config.rockAmount; i++) {
+        for (int i = 0; i < Config.rockCount; i++) {
             Rock rock = makeRock(i);
             rocks.add(rock);
             rock.startThread();
@@ -21,23 +21,23 @@ public class World {
     }
 
     private Rock makeRock(int i) {
-        int rockSize = rand.nextInt(Config.rockSizeMax - Config.rockSizeMin + 1) + Config.rockSizeMin;
-        double posX = rand.nextInt(Math.max(1, Config.screenWidth - 2 * rockSize)) + rockSize;
-        double posY = rand.nextInt(Math.max(1, Config.screenHeight - 2 * rockSize)) + rockSize;
+        int size = rand.nextInt(Config.rockMax - Config.rockMin + 1) + Config.rockMin;
+        double x = rand.nextInt(Math.max(1, Config.w - 2 * size)) + size;
+        double y = rand.nextInt(Math.max(1, Config.h - 2 * size)) + size;
         double angle = rand.nextDouble() * Math.PI * 2;
-        double speed = Config.rockSpeedMin + rand.nextDouble() * (Config.rockSpeedMax - Config.rockSpeedMin) + i * 0.03;
-        double speedX = Math.cos(angle) * speed;
-        double speedY = Math.sin(angle) * speed;
-        return new Rock(posX, posY, speedX, speedY, rockSize);
+        double speed = Config.speedMin + rand.nextDouble() * (Config.speedMax - Config.speedMin) + i * 0.03;
+        double dx = Math.cos(angle) * speed;
+        double dy = Math.sin(angle) * speed;
+        return new Rock(x, y, dx, dy, size);
     }
     
     public void addNewRock(double x, double y) {
-        int rockSize = rand.nextInt(Config.rockSizeMax - Config.rockSizeMin + 1) + Config.rockSizeMin;
+        int size = rand.nextInt(Config.rockMax - Config.rockMin + 1) + Config.rockMin;
         double angle = rand.nextDouble() * Math.PI * 2;
-        double speed = Config.rockSpeedMin + rand.nextDouble() * (Config.rockSpeedMax - Config.rockSpeedMin);
-        double speedX = Math.cos(angle) * speed;
-        double speedY = Math.sin(angle) * speed;
-        Rock rock = new Rock(x, y, speedX, speedY, rockSize);
+        double speed = Config.speedMin + rand.nextDouble() * (Config.speedMax - Config.speedMin);
+        double dx = Math.cos(angle) * speed;
+        double dy = Math.sin(angle) * speed;
+        Rock rock = new Rock(x, y, dx, dy, size);
         rocks.add(rock);
         rock.startThread();
     }
@@ -49,7 +49,7 @@ public class World {
             if (rock.isExplodeFinished()) {
                 rock.stopThread();
                 if (View.autoSpawn) {
-                    View.rocksToSpawn++;
+                    View.toSpawn++;
                 }
                 return true;
             }
@@ -75,7 +75,7 @@ public class World {
             }
         }
         
-        frameCount++;
+        frames++;
     }
 
     private void resolveHits() {
@@ -123,7 +123,7 @@ public class World {
     public double fps() {
         if (!Config.showFPS) return 0;
         long now = System.nanoTime();
-        double sec = (now - startTime) / 1_000_000_000.0;
-        return sec > 0 ? frameCount / sec : 0;
+        double sec = (now - start) / 1_000_000_000.0;
+        return sec > 0 ? frames / sec : 0;
     }
 }

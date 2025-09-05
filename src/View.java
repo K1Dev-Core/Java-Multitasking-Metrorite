@@ -8,51 +8,51 @@ import javax.swing.*;
 
 public class View extends JPanel {
     private final World world;
-    public static volatile boolean isPaused = false;
-    private Rectangle explosionSlider = new Rectangle();
+    public static volatile boolean paused = false;
+    private Rectangle expSlider = new Rectangle();
     private Rectangle dripSlider = new Rectangle();
     private Rectangle speedSlider = new Rectangle();
     private Rectangle bgSlider = new Rectangle();
-    private Rectangle explosionHandle = new Rectangle();
+    private Rectangle expHandle = new Rectangle();
     private Rectangle dripHandle = new Rectangle();
     private Rectangle speedHandle = new Rectangle();
     private Rectangle bgHandle = new Rectangle();
-    private boolean isDraggingExplosion = false;
-    private boolean isDraggingDrip = false;
-    private boolean isDraggingSpeed = false;
-    private boolean isDraggingBG = false;
+    private boolean dragExp = false;
+    private boolean dragDrip = false;
+    private boolean dragSpeed = false;
+    private boolean dragBG = false;
     public static boolean autoSpawn = false;
-    public static int rocksToSpawn = 0;
+    public static int toSpawn = 0;
 
     public View(World world) {
         this.world = world;
-        setPreferredSize(new Dimension(Config.screenWidth, Config.screenHeight));
-        new Timer(Config.updateDelay, _ -> { 
-            if (!isPaused) {
+        setPreferredSize(new Dimension(Config.w, Config.h));
+        new Timer(Config.updateTime, _ -> { 
+            if (!paused) {
                 world.update();
-                if (autoSpawn && rocksToSpawn > 0) {
+                if (autoSpawn && toSpawn > 0) {
                     world.addNewRock(
-                        (int)(Math.random() * (Config.screenWidth - 100)) + 50,
-                        (int)(Math.random() * (Config.screenHeight - 100)) + 50
+                        (int)(Math.random() * (Config.w - 100)) + 50,
+                        (int)(Math.random() * (Config.h - 100)) + 50
                     );
-                    rocksToSpawn--;
+                    toSpawn--;
                 }
             }
         }).start();
         Sound.playBG();
-        new Timer(Config.frameDelay, _ -> repaint()).start();
+        new Timer(Config.frameTime, _ -> repaint()).start();
         
         addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
                 if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
-                    isPaused = !isPaused;
+                    paused = !paused;
                     repaint();
                 }
                 if (e.getKeyCode() == KeyEvent.VK_SPACE) {
                     autoSpawn = !autoSpawn;
                     if (autoSpawn) {
-                        rocksToSpawn = 1;
+                        toSpawn = 1;
                     }
                     repaint();
                 }
@@ -74,65 +74,65 @@ public class View extends JPanel {
             addMouseListener(new MouseAdapter() {
                 @Override
                 public void mousePressed(MouseEvent e) {
-                    if (!isPaused) {
+                    if (!paused) {
                         if (e.getButton() == MouseEvent.BUTTON1) {
                             world.explosions.add(new Explosion(e.getX(), e.getY()));
                         } else if (e.getButton() == MouseEvent.BUTTON3) {
                             world.addNewRock(e.getX(), e.getY());
                         }
                     } else {
-                        if (explosionHandle.contains(e.getPoint())) {
-                            isDraggingExplosion = true;
+                        if (expHandle.contains(e.getPoint())) {
+                            dragExp = true;
                         } else if (dripHandle.contains(e.getPoint())) {
-                            isDraggingDrip = true;
+                            dragDrip = true;
                         } else if (speedHandle.contains(e.getPoint())) {
-                            isDraggingSpeed = true;
+                            dragSpeed = true;
                         } else if (bgHandle.contains(e.getPoint())) {
-                            isDraggingBG = true;
+                            dragBG = true;
                         }
                     }
                 }
                 
                 @Override
                 public void mouseReleased(MouseEvent e) {
-                    isDraggingExplosion = false;
-                    isDraggingDrip = false;
-                    isDraggingSpeed = false;
-                    isDraggingBG = false;
+                    dragExp = false;
+                    dragDrip = false;
+                    dragSpeed = false;
+                    dragBG = false;
                 }
             });
             
             addMouseMotionListener(new MouseMotionAdapter() {
                 @Override
                 public void mouseDragged(MouseEvent e) {
-                    if (isPaused) {
-                        if (isDraggingExplosion) {
-                            float newVolume = ((e.getX() - (getWidth() / 2 - 100)) / 200.0f * 36.0f) - 30;
-                            Sound.explosionVolume = Math.max(-30, Math.min(6, newVolume));
+                    if (paused) {
+                        if (dragExp) {
+                            float vol = ((e.getX() - (getWidth() / 2 - 100)) / 200.0f * 36.0f) - 30;
+                            Sound.expVol = Math.max(-30, Math.min(6, vol));
                             repaint();
-                        } else if (isDraggingDrip) {
-                            float newVolume = ((e.getX() - (getWidth() / 2 - 100)) / 200.0f * 36.0f) - 30;
-                            Sound.dripVolume = Math.max(-30, Math.min(6, newVolume));
+                        } else if (dragDrip) {
+                            float vol = ((e.getX() - (getWidth() / 2 - 100)) / 200.0f * 36.0f) - 30;
+                            Sound.dripVol = Math.max(-30, Math.min(6, vol));
                             repaint();
-                        } else if (isDraggingSpeed) {
-                            float newSpeed = ((e.getX() - (getWidth() / 2 - 100)) / 200.0f * 3.0f) + 0.5f;
-                            Config.rockSpeedMin = Math.max(0.5f, Math.min(3.5f, newSpeed));
-                            Config.rockSpeedMax = Config.rockSpeedMin + 2.0f;
+                        } else if (dragSpeed) {
+                            float speed = ((e.getX() - (getWidth() / 2 - 100)) / 200.0f * 3.0f) + 0.5f;
+                            Config.speedMin = Math.max(0.5f, Math.min(3.5f, speed));
+                            Config.speedMax = Config.speedMin + 2.0f;
                             
                             for (Rock rock : world.rocks) {
                                 if (!rock.isExploding()) {
                                     double currentSpeed = rock.speed();
                                     if (currentSpeed > 0) {
-                                        double ratio = (Config.rockSpeedMin + (Config.rockSpeedMax - Config.rockSpeedMin) / 2) / currentSpeed;
+                                        double ratio = (Config.speedMin + (Config.speedMax - Config.speedMin) / 2) / currentSpeed;
                                         rock.speedX *= ratio;
                                         rock.speedY *= ratio;
                                     }
                                 }
                             }
                             repaint();
-                        } else if (isDraggingBG) {
-                            float newVolume = ((e.getX() - (getWidth() / 2 - 100)) / 200.0f * 36.0f) - 30;
-                            Sound.bgVolume = Math.max(-30, Math.min(6, newVolume));
+                        } else if (dragBG) {
+                            float vol = ((e.getX() - (getWidth() / 2 - 100)) / 200.0f * 36.0f) - 30;
+                            Sound.bgVol = Math.max(-30, Math.min(6, vol));
                             Sound.updateBGVolume();
                             repaint();
                         }
@@ -155,7 +155,7 @@ public class View extends JPanel {
                 SpriteSheet.drawFrame(g, rock.getSpriteType(), rock.getCurrentFrame(),
                         (int) rock.posX, (int) rock.posY, rock.size);
                         
-                if (Config.debugViewMode) {
+                if (Config.debugMode) {
                     g.setColor(Color.WHITE);
                     String info = String.format("ID:%d [%d,%d] Speed:%.1f Size:%d Type:%d", 
                         rock.rockID, (int)rock.posX, (int)rock.posY,
@@ -180,7 +180,7 @@ public class View extends JPanel {
             exp.draw(g);
         }
         
-        if (isPaused) {
+        if (paused) {
             g.setColor(new Color(0, 0, 0, 200));
             g.fillRect(0, 0, getWidth(), getHeight());
             g.setColor(Color.WHITE);
@@ -192,23 +192,23 @@ public class View extends JPanel {
             g.setFont(new Font("Arial", Font.PLAIN, 20));
             g.drawString("Explosion Volume:", getWidth() / 2 - 200, 150);
             
-            explosionSlider.setRect(getWidth() / 2 - 100, 155, 200, 8);
-            explosionHandle.setRect(
-                getWidth() / 2 - 100 + ((Sound.explosionVolume + 30) / 36.0f * 200) - 5,
+            expSlider.setRect(getWidth() / 2 - 100, 155, 200, 8);
+            expHandle.setRect(
+                getWidth() / 2 - 100 + ((Sound.expVol + 30) / 36.0f * 200) - 5,
                 151,
                 10, 16
             );
             
             g.setColor(new Color(100, 100, 100));
-            g.fillRect(explosionSlider.x, explosionSlider.y, explosionSlider.width, explosionSlider.height);
+            g.fillRect(expSlider.x, expSlider.y, expSlider.width, expSlider.height);
             g.setColor(Color.WHITE);
-            g.fill3DRect(explosionHandle.x, explosionHandle.y, explosionHandle.width, explosionHandle.height, true);
+            g.fill3DRect(expHandle.x, expHandle.y, expHandle.width, expHandle.height, true);
             
             g.drawString("Bounce Volume:", getWidth() / 2 - 200, 190);
             
             dripSlider.setRect(getWidth() / 2 - 100, 195, 200, 8);
             dripHandle.setRect(
-                getWidth() / 2 - 100 + ((Sound.dripVolume + 30) / 36.0f * 200) - 5,
+                getWidth() / 2 - 100 + ((Sound.dripVol + 30) / 36.0f * 200) - 5,
                 191,
                 10, 16
             );
@@ -222,7 +222,7 @@ public class View extends JPanel {
             
             speedSlider.setRect(getWidth() / 2 - 100, 235, 200, 8);
             speedHandle.setRect(
-                getWidth() / 2 - 100 + ((Config.rockSpeedMin - 0.5f) / 3.0f * 200) - 5,
+                getWidth() / 2 - 100 + ((Config.speedMin - 0.5f) / 3.0f * 200) - 5,
                 231,
                 10, 16
             );
@@ -236,7 +236,7 @@ public class View extends JPanel {
             
             bgSlider.setRect(getWidth() / 2 - 100, 275, 200, 8);
             bgHandle.setRect(
-                getWidth() / 2 - 100 + ((Sound.bgVolume + 30) / 36.0f * 200) - 5,
+                getWidth() / 2 - 100 + ((Sound.bgVol + 30) / 36.0f * 200) - 5,
                 271,
                 10, 16
             );

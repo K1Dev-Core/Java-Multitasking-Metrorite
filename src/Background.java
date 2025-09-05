@@ -5,60 +5,55 @@ import java.io.IOException;
 import javax.imageio.ImageIO;
 
 public class Background {
-    private static final BufferedImage background;
-    private static double offsetX = 0;
-    private static double offsetY = 0;
-    private static final double SCROLL_SPEED = 0.2;
-    private static BufferedImage blendedBackground;
+    private static final BufferedImage bg;
+    private static double x = 0;
+    private static double y = 0;
+    private static final double SPEED = 0.2;
+    private static BufferedImage blended;
     
     static {
         try {
-            BufferedImage originalBg = ImageIO.read(new File("./res/background/spr_background_space.png"));
+            BufferedImage orig = ImageIO.read(new File("./res/background/spr_background_space.png"));
             
-
-            int w = originalBg.getWidth();
-            int h = originalBg.getHeight();
-            blendedBackground = new BufferedImage(w * 2, h * 2, BufferedImage.TYPE_INT_ARGB);
-            Graphics2D g2d = blendedBackground.createGraphics();
+            int w = orig.getWidth();
+            int h = orig.getHeight();
+            blended = new BufferedImage(w * 2, h * 2, BufferedImage.TYPE_INT_ARGB);
+            Graphics2D g2d = blended.createGraphics();
             
-
-            for (int y = 0; y < 2; y++) {
-                for (int x = 0; x < 2; x++) {
-                    g2d.drawImage(originalBg, x * w, y * h, null);
+            for (int yy = 0; yy < 2; yy++) {
+                for (int xx = 0; xx < 2; xx++) {
+                    g2d.drawImage(orig, xx * w, yy * h, null);
                 }
             }
             
-
             int blendSize = 100;
             float[] scales = new float[blendSize];
             for (int i = 0; i < blendSize; i++) {
                 scales[i] = (float)Math.sin((i / (float)blendSize) * Math.PI/2);
             }
             
-
-            for (int y = 0; y < h * 2; y++) {
+            for (int yy = 0; yy < h * 2; yy++) {
                 for (int i = 0; i < blendSize; i++) {
                     float alpha = scales[i];
                     g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha));
-                    g2d.drawImage(originalBg, 
-                        w - blendSize + i, y, w - blendSize + i + 1, y + 1,
-                        0, y % h, 1, (y % h) + 1, null);
+                    g2d.drawImage(orig, 
+                        w - blendSize + i, yy, w - blendSize + i + 1, yy + 1,
+                        0, yy % h, 1, (yy % h) + 1, null);
                 }
             }
             
-
-            for (int x = 0; x < w * 2; x++) {
+            for (int xx = 0; xx < w * 2; xx++) {
                 for (int i = 0; i < blendSize; i++) {
                     float alpha = scales[i];
                     g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha));
-                    g2d.drawImage(originalBg,
-                        x, h - blendSize + i, x + 1, h - blendSize + i + 1,
-                        x % w, 0, (x % w) + 1, 1, null);
+                    g2d.drawImage(orig,
+                        xx, h - blendSize + i, xx + 1, h - blendSize + i + 1,
+                        xx % w, 0, (xx % w) + 1, 1, null);
                 }
             }
             
             g2d.dispose();
-            background = blendedBackground;
+            bg = blended;
             Debug.log("Loaded and blended background successfully");
         } catch (IOException e) {
             Debug.log("Error loading background: " + e.getMessage());
@@ -67,28 +62,27 @@ public class Background {
     }
 
     public static void update() {
-        offsetX += SCROLL_SPEED;
-        offsetY += SCROLL_SPEED;
+        x += SPEED;
+        y += SPEED;
         
-        if (offsetX >= background.getWidth() / 2) {
-            offsetX -= background.getWidth() / 2;
+        if (x >= bg.getWidth() / 2) {
+            x -= bg.getWidth() / 2;
         }
-        if (offsetY >= background.getHeight() / 2) {
-            offsetY -= background.getHeight() / 2;
+        if (y >= bg.getHeight() / 2) {
+            y -= bg.getHeight() / 2;
         }
     }
 
     public static void draw(Graphics g, int width, int height) {
-        int bgWidth = background.getWidth() / 2;
-        int bgHeight = background.getHeight() / 2;
+        int bgW = bg.getWidth() / 2;
+        int bgH = bg.getHeight() / 2;
         
+        int startX = (int)x - bgW;
+        int startY = (int)y - bgH;
 
-        int startX = (int)offsetX - bgWidth;
-        int startY = (int)offsetY - bgHeight;
-
-        g.drawImage(background, 
-            startX, startY, startX + bgWidth * 2, startY + bgHeight * 2,
-            0, 0, background.getWidth(), background.getHeight(),
+        g.drawImage(bg, 
+            startX, startY, startX + bgW * 2, startY + bgH * 2,
+            0, 0, bg.getWidth(), bg.getHeight(),
             null);
     }
 }
