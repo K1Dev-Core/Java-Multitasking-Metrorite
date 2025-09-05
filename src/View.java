@@ -23,7 +23,6 @@ public class View extends JPanel {
     private boolean dragBG = false;
     public static boolean autoSpawn = false;
     public static int toSpawn = 0;
-    private static BufferedImage team1, team2, team3;
 
     public View(World world) {
         this.world = world;
@@ -84,14 +83,6 @@ public class View extends JPanel {
             setCursor(customCursor); 
         } catch (IOException e) {
             Debug.log("Error loading crosshair: " + e.getMessage());
-        }
-        
-        try {
-            team1 = ImageIO.read(new File("./res/team/member_king.jpg"));
-            team2 = ImageIO.read(new File("./res/team/member_mint.jpg"));
-            team3 = ImageIO.read(new File("./res/team/member2.jpg"));
-        } catch (IOException e) {
-            Debug.log("Error loading team images: " + e.getMessage());
         }
         
         if (Config.debug){
