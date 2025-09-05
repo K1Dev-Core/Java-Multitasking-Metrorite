@@ -30,7 +30,7 @@ public class View extends JPanel {
         new Timer(Config.updateTime, _ -> { 
             if (!paused) {
                 world.update();
-                if (autoSpawn && toSpawn > 0) {
+                if (autoSpawn && toSpawn > 0 && !world.rocks.isEmpty()) {
                     world.addNewRock(
                         (int)(Math.random() * (Config.w - 100)) + 50,
                         (int)(Math.random() * (Config.h - 100)) + 50
@@ -46,8 +46,30 @@ public class View extends JPanel {
             @Override
             public void keyPressed(KeyEvent e) {
                 if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
-                    paused = !paused;
-                    repaint();
+                    if (!world.rocks.isEmpty()) {
+                        paused = !paused;
+                        repaint();
+                    }
+                }
+                if (e.getKeyCode() >= KeyEvent.VK_0 && e.getKeyCode() <= KeyEvent.VK_9) {
+                    if (world.rocks.isEmpty()) {
+                        int num = e.getKeyCode() - KeyEvent.VK_0;
+                        Config.rockCount = Config.rockCount * 10 + num;
+                        if (Config.rockCount > Config.rockMaxCount) Config.rockCount = Config.rockMaxCount;
+                        repaint();
+                    }
+                }
+                if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+                    if (world.rocks.isEmpty() && Config.rockCount > 0) {
+                        world.init();
+                        repaint();
+                    }
+                }
+                if (e.getKeyCode() == KeyEvent.VK_BACK_SPACE) {
+                    if (world.rocks.isEmpty()) {
+                        Config.rockCount = Config.rockCount / 10;
+                        repaint();
+                    }
                 }
                 if (e.getKeyCode() == KeyEvent.VK_R) {
                                             if (!Config.cameraMode) {
@@ -63,11 +85,19 @@ public class View extends JPanel {
                     repaint();
                 }
                 if (e.getKeyCode() == KeyEvent.VK_SPACE) {
-                    autoSpawn = !autoSpawn;
-                    if (autoSpawn) {
-                        toSpawn = 1;
+                    if (world.rocks.isEmpty()) {
+                        autoSpawn = !autoSpawn;
+                        if (autoSpawn) {
+                            toSpawn = 1;
+                        }
+                        repaint();
+                    } else {
+                        autoSpawn = !autoSpawn;
+                        if (autoSpawn) {
+                            toSpawn = 1;
+                        }
+                        repaint();
                     }
-                    repaint();
                 }
             }
         });
@@ -89,6 +119,9 @@ public class View extends JPanel {
             addMouseListener(new MouseAdapter() {
                 @Override
                 public void mousePressed(MouseEvent e) {
+                    if (world.rocks.isEmpty()) {
+                        return;
+                    }
                     if (!paused) {
                         if (e.getButton() == MouseEvent.BUTTON1) {
                             world.explosions.add(new Explosion(e.getX(), e.getY()));
@@ -220,6 +253,47 @@ public class View extends JPanel {
             ExplosionSprite.drawFrame(g, exp.frame, drawX, drawY, drawSize * 4);
         }
         
+        if (world.rocks.isEmpty()) {
+            g.setColor(new Color(0, 0, 0, 220));
+            g.fillRect(0, 0, getWidth(), getHeight());
+            
+            int centerX = getWidth() / 2;
+            int centerY = getHeight() / 2;
+
+            g.setColor(Color.WHITE);
+            g.setFont(new Font("Arial", Font.BOLD, 42));
+            String title = "Enter Meteor Count";
+            FontMetrics fm = g.getFontMetrics();
+            g.drawString(title, centerX - fm.stringWidth(title) / 2, centerY - 120);
+            
+            g.setFont(new Font("Arial", Font.BOLD, 28));
+            g.setColor(new Color(255, 215, 0));
+            String countText = "Count: " + Config.rockCount;
+            fm = g.getFontMetrics();
+            g.drawString(countText, centerX - fm.stringWidth(countText) / 2, centerY - 60);
+            
+            g.setFont(new Font("Arial", Font.PLAIN, 18));
+            g.setColor(new Color(200, 200, 200));
+            String instruction1 = "Press 0-9 to input number, ENTER to start";
+            fm = g.getFontMetrics();
+            g.drawString(instruction1, centerX - fm.stringWidth(instruction1) / 2, centerY - 20);
+            
+            String instruction2 = "SPACE for Auto Spawn";
+            fm = g.getFontMetrics();
+            g.drawString(instruction2, centerX - fm.stringWidth(instruction2) / 2, centerY + 10);
+            
+            g.setColor(new Color(40, 40, 40));
+            g.fillRoundRect(centerX - 120, centerY + 30, 240, 35, 8, 8);
+            g.setColor(autoSpawn ? new Color(0, 150, 0) : new Color(150, 0, 0));
+            g.fillRoundRect(centerX - 115, centerY + 35, 230, 25, 5, 5);
+            g.setColor(Color.WHITE);
+            g.setFont(new Font("Arial", Font.BOLD, 16));
+            String autoText = autoSpawn ? "AUTO SPAWN: ON" : "AUTO SPAWN: OFF";
+            fm = g.getFontMetrics();
+            g.drawString(autoText, centerX - fm.stringWidth(autoText) / 2, centerY + 52);
+
+        }
+        
         if (paused) {
             g.setColor(new Color(0, 0, 0, 200));
             g.fillRect(0, 0, getWidth(), getHeight());
@@ -328,6 +402,7 @@ public class View extends JPanel {
             String gameTitle = "Java Multitasking Metrorite Game";
             int titleWidth = g.getFontMetrics().stringWidth(gameTitle);
             g.drawString(gameTitle, centerX - titleWidth/2, startY + 20);
+            
         }
         Font originalFont = g.getFont();
         g.setColor(Color.white);

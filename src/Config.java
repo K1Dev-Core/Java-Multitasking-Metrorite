@@ -1,9 +1,10 @@
 public class Config {
     public static int w = 640;
     public static int h = 960;
-    public static int rockCount = 12;
+    public static int rockCount = 0;
     public static int rockMin = 20;
     public static int rockMax = 30;
+    public static int rockMaxCount = 512;
     public static double speedMin = 1.2;
     public static double speedMax = 3.2;
     public static double speedUp = 1.08;

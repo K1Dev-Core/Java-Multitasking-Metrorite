@@ -3,11 +3,7 @@ import javax.swing.*;
 public class App {
     public static void main(String[] args) {
         String mode = !Config.debug ? " " : "DevMode";
-        String input = JOptionPane.showInputDialog("Metrorite Amount: ( "+mode+" )");
-        int count = Config.rockCount;
-        try { count = Integer.parseInt(input); } catch (Exception ignored) {}
-        Config.rockCount = count;
-
+        
         World w = new World();
         w.init();
         JFrame f = new JFrame("Meteor Game ( "+mode+" )");
