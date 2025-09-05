@@ -94,8 +94,8 @@ public class World {
                 }
             }
             if (target != null) {
-                Config.cameraX += (target.posX - Config.cameraX) * 0.1;
-                Config.cameraY += (target.posY - Config.cameraY) * 0.1;
+                Config.cameraX += (target.posX - Config.cameraX) * Config.cameraSpeed;
+                Config.cameraY += (target.posY - Config.cameraY) * Config.cameraSpeed;
             }
         }
     }

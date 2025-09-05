@@ -20,5 +20,6 @@ public class Config {
     public static boolean cameraMode = false;
     public static double cameraX = 0;
     public static double cameraY = 0;
-    public static double cameraZoom = 1.0;
+    public static double cameraZoom = 1.5;
+    public static double cameraSpeed = 0.05;
 }

@@ -23,6 +23,7 @@ public class View extends JPanel {
     private boolean dragBG = false;
     public static boolean autoSpawn = false;
     public static int toSpawn = 0;
+    private static BufferedImage team1, team2, team3;
 
     public View(World world) {
         this.world = world;
@@ -50,18 +51,16 @@ public class View extends JPanel {
                     repaint();
                 }
                 if (e.getKeyCode() == KeyEvent.VK_R) {
-                    if (!Config.cameraMode) {
-                        if (!world.rocks.isEmpty()) {
-                            Rock target = world.rocks.get((int)(Math.random() * world.rocks.size()));
-                            Config.cameraX = target.posX;
-                            Config.cameraY = target.posY;
-                            Config.cameraZoom = 2.0;
-                            Config.cameraMode = true;
+                                            if (!Config.cameraMode) {
+                            if (!world.rocks.isEmpty()) {
+                                Rock target = world.rocks.get((int)(Math.random() * world.rocks.size()));
+                                Config.cameraX = target.posX;
+                                Config.cameraY = target.posY;
+                                Config.cameraMode = true;
+                            }
+                        } else {
+                            Config.cameraMode = false;
                         }
-                    } else {
-                        Config.cameraMode = false;
-                        Config.cameraZoom = 1.0;
-                    }
                     repaint();
                 }
                 if (e.getKeyCode() == KeyEvent.VK_SPACE) {
@@ -85,7 +84,17 @@ public class View extends JPanel {
             setCursor(customCursor); 
         } catch (IOException e) {
             Debug.log("Error loading crosshair: " + e.getMessage());
-        }if (Config.debug){
+        }
+        
+        try {
+            team1 = ImageIO.read(new File("./res/team/member_king.jpg"));
+            team2 = ImageIO.read(new File("./res/team/member_mint.jpg"));
+            team3 = ImageIO.read(new File("./res/team/member2.jpg"));
+        } catch (IOException e) {
+            Debug.log("Error loading team images: " + e.getMessage());
+        }
+        
+        if (Config.debug){
             addMouseListener(new MouseAdapter() {
                 @Override
                 public void mousePressed(MouseEvent e) {
@@ -161,10 +170,15 @@ public class View extends JPanel {
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
         Background.draw(g, getWidth(), getHeight());
+ 
+        g.setColor(new Color(7, 7, 7, 242));
+        g.drawRect(0, 0, getWidth()-1, getHeight()-1);
+        g.drawRect(1, 1, getWidth()-3, getHeight()-3);
         
         for (Rock rock : world.rocks) {
             int drawX = (int) rock.posX;
             int drawY = (int) rock.posY;
+            
             int drawSize = rock.size;
             
             if (Config.cameraMode) {
@@ -286,13 +300,53 @@ public class View extends JPanel {
             g.fillRect(getWidth() / 2 - 100, 325, 200, 20);
             g.setColor(Color.WHITE);
             g.drawString(autoSpawn ? "ON" : "OFF", getWidth() / 2 - 10, 340);
+            
+            g.setFont(new Font("Tahoma", Font.BOLD, 28));
+            g.setColor(new Color(255, 215, 0));
+            g.drawString("ทีมพัฒนา", getWidth() / 2 - 60, 380);
+            
+            int centerX = getWidth() / 2;
+            int startY = 420;
+            int spacing = 80;
+            
+            int[] positions = {centerX - spacing, centerX, centerX + spacing};
+            String[] names = {"วชิรวิทย์ วงค์แสง", "ชินดนัย ภูหัดสวน", "นางสาวเศรณี ภูนาโพธิ์"};
+            String[] ids = {"(67011212055)", "(67011212026)", "(67011212143)"};
+            String[] roles = {"Project Manager", "Lead Developer", "UI/UX Designer"};
+            
+            for (int i = 0; i < 3; i++) {
+                g.setFont(new Font("Tahoma", Font.BOLD, 16));
+                g.setColor(Color.WHITE);
+                int nameWidth = g.getFontMetrics().stringWidth(names[i]);
+                g.drawString(names[i], positions[i] - nameWidth/2, startY);
+                
+                g.setFont(new Font("Tahoma", Font.PLAIN, 14));
+                g.setColor(new Color(200, 200, 200));
+                int idWidth = g.getFontMetrics().stringWidth(ids[i]);
+                g.drawString(ids[i], positions[i] - idWidth/2, startY + 25);
+                
+                g.setColor(new Color(150, 150, 150));
+                int roleWidth = g.getFontMetrics().stringWidth(roles[i]);
+                g.drawString(roles[i], positions[i] - roleWidth/2, startY + 45);
+                
+                startY += 100;
+            }
+            
+            g.setFont(new Font("Tahoma", Font.ITALIC, 16));
+            g.setColor(new Color(150, 150, 150));
+            String gameTitle = "Java Multitasking Metrorite Game";
+            int titleWidth = g.getFontMetrics().stringWidth(gameTitle);
+            g.drawString(gameTitle, centerX - titleWidth/2, startY + 20);
         }
         Font originalFont = g.getFont();
         g.setColor(Color.white);
         g.setFont(new Font("Arial", Font.PLAIN, 16));
         g.drawString("Alive: " + world.alive(), 10, 20);
         if (Config.showFPS) g.drawString(String.format("FPS: %.0f", world.fps()), 10, 38);
-        if (Config.cameraMode) g.drawString("CAMERA MODE (R to exit)", 10, 56);
+        if (Config.cameraMode) {
+            g.drawString("CAMERA MODE (R to exit)", 10, 56);
+            g.drawString("Target: " + (int)Config.cameraX + "," + (int)Config.cameraY, 10, 74);
+        }
         g.setFont(originalFont);
     }
 }
