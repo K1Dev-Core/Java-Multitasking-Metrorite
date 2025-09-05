@@ -2,7 +2,7 @@ import java.awt.*;
 
 public class Explosion {
     public final int x, y;
-    private int frame;
+    public int frame;
     public final int size;
     private boolean done;
     

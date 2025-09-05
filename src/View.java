@@ -90,7 +90,9 @@ public class View extends JPanel {
                 @Override
                 public void mousePressed(MouseEvent e) {
                     if (!paused) {
-                        if (e.getButton() == MouseEvent.BUTTON3) {
+                        if (e.getButton() == MouseEvent.BUTTON1) {
+                            world.explosions.add(new Explosion(e.getX(), e.getY()));
+                        } else if (e.getButton() == MouseEvent.BUTTON3) {
                             world.addNewRock(e.getX(), e.getY());
                         }
                     } else {
@@ -199,6 +201,19 @@ public class View extends JPanel {
                 }    }
         }
 
+        for (Explosion exp : world.explosions) {
+            int drawX = exp.x;
+            int drawY = exp.y;
+            int drawSize = exp.size;
+            
+            if (Config.cameraMode) {
+                drawX = (int)((exp.x - Config.cameraX) * Config.cameraZoom + getWidth() / 2);
+                drawY = (int)((exp.y - Config.cameraY) * Config.cameraZoom + getHeight() / 2);
+                drawSize = (int)(exp.size * Config.cameraZoom);
+            }
+            
+            ExplosionSprite.drawFrame(g, exp.frame, drawX, drawY, drawSize * 4);
+        }
         
         if (paused) {
             g.setColor(new Color(0, 0, 0, 200));
