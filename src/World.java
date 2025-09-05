@@ -84,6 +84,20 @@ public class World {
             frames = 0;
             lastTime = now;
         }
+        
+        if (Config.cameraMode && !rocks.isEmpty()) {
+            Rock target = null;
+            for (Rock rock : rocks) {
+                if (!rock.isExploding()) {
+                    target = rock;
+                    break;
+                }
+            }
+            if (target != null) {
+                Config.cameraX += (target.posX - Config.cameraX) * 0.1;
+                Config.cameraY += (target.posY - Config.cameraY) * 0.1;
+            }
+        }
     }
 
     private void resolveHits() {

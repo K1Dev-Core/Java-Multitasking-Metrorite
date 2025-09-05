@@ -17,4 +17,8 @@ public class Config {
     public static float expVol = -25.0f;
     public static float dripVol = -20.0f;
     public static float bgVol = -5.0f;
+    public static boolean cameraMode = false;
+    public static double cameraX = 0;
+    public static double cameraY = 0;
+    public static double cameraZoom = 1.0;
 }

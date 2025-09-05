@@ -1,9 +1,9 @@
 import java.awt.*;
 
 public class Explosion {
-    private final int x, y;
+    public final int x, y;
     private int frame;
-    private final int size;
+    public final int size;
     private boolean done;
     
     public Explosion(int x, int y) {

@@ -49,6 +49,21 @@ public class View extends JPanel {
                     paused = !paused;
                     repaint();
                 }
+                if (e.getKeyCode() == KeyEvent.VK_R) {
+                    if (!Config.cameraMode) {
+                        if (!world.rocks.isEmpty()) {
+                            Rock target = world.rocks.get((int)(Math.random() * world.rocks.size()));
+                            Config.cameraX = target.posX;
+                            Config.cameraY = target.posY;
+                            Config.cameraZoom = 2.0;
+                            Config.cameraMode = true;
+                        }
+                    } else {
+                        Config.cameraMode = false;
+                        Config.cameraZoom = 1.0;
+                    }
+                    repaint();
+                }
                 if (e.getKeyCode() == KeyEvent.VK_SPACE) {
                     autoSpawn = !autoSpawn;
                     if (autoSpawn) {
@@ -75,9 +90,7 @@ public class View extends JPanel {
                 @Override
                 public void mousePressed(MouseEvent e) {
                     if (!paused) {
-                        if (e.getButton() == MouseEvent.BUTTON1) {
-                            world.explosions.add(new Explosion(e.getX(), e.getY()));
-                        } else if (e.getButton() == MouseEvent.BUTTON3) {
+                        if (e.getButton() == MouseEvent.BUTTON3) {
                             world.addNewRock(e.getX(), e.getY());
                         }
                     } else {
@@ -148,12 +161,22 @@ public class View extends JPanel {
         Background.draw(g, getWidth(), getHeight());
         
         for (Rock rock : world.rocks) {
+            int drawX = (int) rock.posX;
+            int drawY = (int) rock.posY;
+            int drawSize = rock.size;
+            
+            if (Config.cameraMode) {
+                drawX = (int)((rock.posX - Config.cameraX) * Config.cameraZoom + getWidth() / 2);
+                drawY = (int)((rock.posY - Config.cameraY) * Config.cameraZoom + getHeight() / 2);
+                drawSize = (int)(rock.size * Config.cameraZoom);
+            }
+            
             if (rock.isExploding()) {
                 ExplosionSprite.drawFrame(g, rock.getExplosionFrame(),
-                        (int) rock.posX, (int) rock.posY, rock.size * 4);
+                        drawX, drawY, drawSize * 4);
             } else {
                 SpriteSheet.drawFrame(g, rock.getSpriteType(), rock.getCurrentFrame(),
-                        (int) rock.posX, (int) rock.posY, rock.size);
+                        drawX, drawY, drawSize);
                         
                 if (Config.debugMode) {
                     g.setColor(Color.WHITE);
@@ -176,9 +199,6 @@ public class View extends JPanel {
                 }    }
         }
 
-        for (Explosion exp : world.explosions) {
-            exp.draw(g);
-        }
         
         if (paused) {
             g.setColor(new Color(0, 0, 0, 200));
@@ -257,6 +277,7 @@ public class View extends JPanel {
         g.setFont(new Font("Arial", Font.PLAIN, 16));
         g.drawString("Alive: " + world.alive(), 10, 20);
         if (Config.showFPS) g.drawString(String.format("FPS: %.0f", world.fps()), 10, 38);
+        if (Config.cameraMode) g.drawString("CAMERA MODE (R to exit)", 10, 56);
         g.setFont(originalFont);
     }
 }
